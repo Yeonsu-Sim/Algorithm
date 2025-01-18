@@ -51,13 +51,10 @@ public class Main {
                 hard = Math.max(hard, n);
             }
 
-            // min과 max 사이인지 확인하기
-            if (sum >= min && sum <= max) {
-                // gap 확인하기
-                if (hard - easy >= gap) {
-                    // result 갱신하기
-                    result++;
-                }
+            // min과 max 사이인지, gap 이상인지 확인하기
+            if (sum >= min && sum <= max && (hard-easy >= gap)) {
+                // result 갱신하기
+                result++;
             }
             return;
         }
