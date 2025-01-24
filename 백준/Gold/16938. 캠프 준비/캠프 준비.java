@@ -3,7 +3,7 @@ import java.util.*;
 
 
 public class Main {
-    static int N, L , R, X, result;
+    static int gap , size, min , max, result;
     static int[] in;
 
     public static void main(String[] args) throws IOException {
@@ -13,10 +13,10 @@ public class Main {
         String[] line = br.readLine().split(" ");
 
         // 조건 저장
-        N = Integer.parseInt(line[0]);
-        L = Integer.parseInt(line[1]);
-        R = Integer.parseInt(line[2]);
-        X = Integer.parseInt(line[3]);
+        size = Integer.parseInt(line[0]);
+        min = Integer.parseInt(line[1]);
+        max = Integer.parseInt(line[2]);
+        gap = Integer.parseInt(line[3]);
 
 
         String[] input = br.readLine().split(" ");
@@ -29,25 +29,40 @@ public class Main {
 
         result = 0;
 
-        for (int i=0; i<(1<<N); i++) {
-            int cnt = 0;
-            int sum = 0;
-            int min = Integer.MAX_VALUE;
-            int max = Integer.MIN_VALUE;
-
-            for (int j=0; j<N; j++) {
-                if ((i & (1<<j)) > 0) {
-                    cnt++;
-                    sum += in[j];
-                    min = Math.min(min, in[j]);
-                    max = Math.max(max, in[j]);
-                }
-            }
-            if (cnt<2 || sum < L || sum > R || max - min < X) continue;
-            result++;
+        for (int i=2; i<=size; i++) {
+            // dfs 시작
+            dfs(0, new int[i], i, 0);
         }
 
         System.out.println(result);
 
+    }
+
+    static void dfs(int depth, int[] out, int pick, int start) {
+
+        if (depth == pick ){
+            int sum=0;
+            int easy = out[0];
+            int hard = out[0];
+
+            for (int n : out) {
+                sum += n;
+                easy = Math.min(easy,n);
+                hard = Math.max(hard, n);
+            }
+
+            // min과 max 사이인지, gap 이상인지 확인하기
+            if (sum >= min && sum <= max && (hard-easy >= gap)) {
+                // result 갱신하기
+                result++;
+            }
+            return;
+        }
+
+        // size 만큼 뽑기
+        for (int i=start; i<in.length; i++) {
+            out[depth] = in[i];
+            dfs(depth+1, out, pick, i+1);
+        }
     }
 }
