@@ -2,10 +2,9 @@ import java.io.*;
 import java.util.Arrays;
 
 public class Main {
-    static int N, M, answer = Integer.MAX_VALUE;
-    static int[] arr, tmp;
+    static int N, M, answer = 0;
+    static int[] arr, tmp, out;
     static boolean[] visited;
-    static boolean found;
     static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
@@ -22,31 +21,27 @@ public class Main {
         tmp[M++] = n;
         arr = new int[M];
         visited = new boolean[M];
+        out = new int[M];
         for (int i = 0; i < M; i++) {
             arr[i] = tmp[i];
         }
 
         Arrays.sort(arr);
-        dfs(0, new int[M]);
-        if (found) {
-            System.out.println(answer);
-        } else {
-            System.out.println(0);
-        }
+        dfs(0);
+        System.out.println(answer);
+
     }
-    static void dfs(int depth, int[] out) {
-        if (found) {
+    static void dfs(int depth) {
+        if (answer != 0) {
             return;
         }
-
         if (depth == M) {
             for (int i = 0; i < M; i++) {
                 sb.append(out[i]);
             }
             int n = Integer.parseInt((sb.toString()));
             if (N < n) {
-                answer = Integer.min(answer, n);
-                found = true;
+                answer = n;
             }
             sb.setLength(0);
             return;
@@ -58,7 +53,7 @@ public class Main {
             }
             out[depth] = arr[i];
             visited[i] = true;
-            dfs(depth+1, out);
+            dfs(depth+1);
             visited[i] = false;
         }
     }
