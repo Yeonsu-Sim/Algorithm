@@ -2,47 +2,46 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	static int N, M;
-	static int arr[], result[];
-	static StringBuilder sb = new StringBuilder();
-	
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		
-		arr = new int[N+1];
-		result = new int[M];
-		
-		st = new StringTokenizer(br.readLine(), " ");
-		
-		for(int i=1; i<=N; i++)
-			arr[i] = Integer.parseInt(st.nextToken());
-		
-		Arrays.sort(arr);
-		DFS(1, 0);
-		System.out.println(sb);
-	}
-	
-	public static void DFS(int start, int depth) {
-		int num = 0;
-		
-		if(depth == M) {
-			for(int k : result)
-				sb.append(k).append(' ');
-			
-			sb.append('\n');
-			return;
-		}
-		
-		for(int i=start; i<=N; i++) {
-			if(num == arr[i]) continue;
-			
-			result[depth] = arr[i];
-			DFS(i+1, depth+1);
-			num = arr[i];	
-		}
-	}
+    static int N, M;
+    static int[] in, out;
+    static StringBuilder sb;
+    public static void main(String[] args) throws IOException {
+        sb = new StringBuilder();
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String[] line = br.readLine().split(" ");
+
+        N = Integer.parseInt(line[0]);
+        M = Integer.parseInt(line[1]);
+
+        in = new int[N];
+        out = new int[M];
+
+        line = br.readLine().split(" ");
+        for (int i = 0; i < N; i++) {
+            in[i] = Integer.parseInt(line[i]);
+        }
+        Arrays.sort(in);
+        dfs(0, 0);
+        System.out.println(sb);
+    }
+
+    static void dfs(int depth, int start) {
+        int num = 0;
+
+        if (depth == M) {
+            for (int i = 0; i < M; i++) {
+                sb.append(out[i]).append(' ');
+            }
+            sb.append('\n');
+            return;
+        }
+
+        for (int i = start; i < N; i++) {
+            if (num == in[i]) continue;
+            out[depth] = in[i];
+            dfs(depth + 1, i + 1);
+            num = in[i];  // 중복 순열 제거
+        }
+    }
 }
