@@ -48,11 +48,7 @@ class Main {
     static void bfs(int node) {
         int order = 1;
         visited[node-1] = order++;
-
-        for (int v : list.get(R)) {
-            queue.offer(v);
-            visited[v-1] = order++;
-        }
+        queue.offer(node);
 
         while (!queue.isEmpty()) {
             int visit = queue.poll();
