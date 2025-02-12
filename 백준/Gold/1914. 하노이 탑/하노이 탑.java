@@ -8,8 +8,10 @@ import java.util.*;
 public class Main {
 
     static int N;
+    static StringBuilder sb = new StringBuilder();
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
         N = Integer.parseInt(br.readLine());
 
         BigInteger count = new BigInteger("2");
@@ -20,6 +22,7 @@ public class Main {
             return;
         }
         move(N, 1, 3, 2);
+        System.out.println(sb);
     }
 
     // num을 목적지에 쌓기
@@ -30,7 +33,7 @@ public class Main {
         
         // num-1을 
         move(depth-1, from, temp, to);
-        System.out.println(from + " " + to);
+        sb.append(from).append(' ').append(to).append('\n');
         move(depth-1, temp, to, from);
     }
 }
