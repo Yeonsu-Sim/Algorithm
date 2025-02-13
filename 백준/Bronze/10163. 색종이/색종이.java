@@ -3,7 +3,7 @@ import java.util.*;
 
 public class Main {
     static int N, x, y, w, h, area;
-    static int[][] arr = new int[1000][1000];
+    static int[][] arr = new int[1001][1001];
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -30,8 +30,8 @@ public class Main {
         
         // 각 색종이의 가시 면적 구하기
         for (int n=0; n<N; n++) {
-            for (int i=0; i<1000; i++) {
-                for (int j=0; j<1000; j++) {
+            for (int i=0; i<1001; i++) {
+                for (int j=0; j<1001; j++) {
                     if (arr[i][j] == n+1) {
                         area++;
                     }
@@ -40,7 +40,6 @@ public class Main {
             sb.append(area).append('\n');
             area = 0;
         }
-
 
         System.out.println(sb);
     }
