@@ -28,12 +28,14 @@ public class Main {
             return;
         }
 
-        move(arr[start1], arr[start1]);
+        move(arr[start1]);
         
         System.out.println(count);
     }
 
-    static void move(int prevNum, int lastNum) {
+    static void move(int prevNum) {
+
+        int lastNum = prevNum;
         if(end2 == N-1) return;
         for (int i=start1+1; i<N; i++) {
             if (arr[i] != prevNum) {
@@ -63,6 +65,6 @@ public class Main {
 
         start1 = start2;
         end1 = end2;
-        move(lastNum, lastNum);
+        move(lastNum);
     }
 }
