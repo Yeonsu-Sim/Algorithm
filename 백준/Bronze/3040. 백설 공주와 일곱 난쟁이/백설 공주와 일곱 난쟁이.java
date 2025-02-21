@@ -7,28 +7,31 @@ public class Main {
         StringBuilder sb = new StringBuilder();
 
         int[] dwarf = new int[9];
+        int target = 0;
         for (int i=0; i<9; i++) {
             dwarf[i] = Integer.parseInt(br.readLine());
+            target += dwarf[i];
         }
 
-        comb(0, 0, 0, dwarf, new int[7]);
+        comb(0, 0, target-100, 0, dwarf, new int[2]);
     }
 
-    static void comb(int count, int start, int sum, int[] dwarf, int[] out) {
-        if (sum > 100) return;
+    static void comb(int count, int start, int target, int sum, int[] dwarf, int[] out) {
+        if (sum > target) return;
 
-        if (count == 7) {
-            if (sum == 100) {
-                for (int i=0; i<7; i++) {
-                    System.out.println(out[i]);
+        if (count == 2) {
+            if (sum == target) {
+                for (int i=0; i<9; i++) {
+                    if (out[0] == i || out[1] == i) continue;
+                    System.out.println(dwarf[i]);
                 }
             }
             return;
         }
 
         for (int i=start; i<9; i++) {
-            out[count] = dwarf[i];
-            comb(count+1, i+1, sum+dwarf[i], dwarf, out);
+            out[count] = i;
+            comb(count+1, i+1, target, sum+dwarf[i], dwarf, out);
         }
     }
 }
