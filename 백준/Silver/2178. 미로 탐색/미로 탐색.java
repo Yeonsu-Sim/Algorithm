@@ -2,19 +2,6 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-
-    static class Pos {
-        int x;
-        int y;
-        int count;
-
-        Pos(int x, int y, int count) {
-            this.x = x;
-            this.y = y;
-            this.count = count;
-        }
-    }
-
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
@@ -35,25 +22,25 @@ public class Main {
     }
 
     static int bfs(int N, int M, int[][] input) {
-        Queue<Pos> queue = new ArrayDeque<>();
+        Queue<int[]> queue = new ArrayDeque<>();
         boolean[][] visited = new boolean[N][M]; // 방문 배열 추가
 
         int[] dx = {0, 0, -1, 1};  // 상하좌우
         int[] dy = {-1, 1, 0, 0};
 
-        queue.offer(new Pos(0, 0, 1)); // 시작 지점
+        queue.offer(new int[] {0,0,1}); // 시작 지점 x, y, count
         visited[0][0] = true; // 시작 지점 방문 처리
 
         while (!queue.isEmpty()) {
-            Pos pos = queue.poll();
+            int[] pos = queue.poll();
 
-            if (pos.y == N - 1 && pos.x == M - 1) { // 목적지 도달
-                return pos.count;
+            if (pos[1] == N - 1 && pos[0] == M - 1) { // 목적지 도달
+                return pos[2];
             }
 
             for (int d = 0; d < 4; d++) {
-                int x = pos.x + dx[d];
-                int y = pos.y + dy[d];
+                int x = pos[0] + dx[d];
+                int y = pos[1] + dy[d];
 
                 // 범위 체크
                 if (x < 0 || x >= M || y < 0 || y >= N) continue;
@@ -62,7 +49,7 @@ public class Main {
                 if (input[y][x] == 0 || visited[y][x]) continue;
 
                 visited[y][x] = true; // 방문 처리
-                queue.offer(new Pos(x, y, pos.count + 1)); // 큐에 새로운 좌표와 count 추가
+                queue.offer(new int[] {x, y, pos[2]+1}); // 큐에 새로운 좌표와 count 추가
             }
         }
         return -1; // 경로가 없을 경우
