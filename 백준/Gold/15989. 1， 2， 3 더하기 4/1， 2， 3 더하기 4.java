@@ -5,6 +5,7 @@ import static java.lang.Integer.parseInt;
 public class Main {
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringBuilder sb = new StringBuilder();
 
         int[] dp = new int[10001];
         dp[3] = 1;
@@ -17,8 +18,10 @@ public class Main {
         for (int i=0; i<T; i++) {
             int N = parseInt(br.readLine());
                 
-            if (N < 4) System.out.println(N);
-            else System.out.println((N-3)/2+1 + dp[N-3] + N/2 + 1);
+            if (N < 4) sb.append(N);
+            else sb.append((N-3)/2+1 + dp[N-3] + N/2 + 1);
+            sb.append('\n');
         }
+        System.out.print(sb);
     }
 }
