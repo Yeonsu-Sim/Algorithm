@@ -21,18 +21,16 @@ public class Main {
     }
 
     int[] parents = new int[N+1];
-    boolean[] visited = new boolean[N+1];
 
     Queue<Integer> q = new ArrayDeque<>();
     q.offer(1);
-    visited[1] = true;
+    parents[1] = -1;
 
     while (!q.isEmpty()) {
       int cur = q.poll();
       for (int child : graph[cur]) {
-        if (visited[child]) continue;
+        if (parents[child] != 0) continue;
         parents[child] = cur;
-        visited[child] = true;
         q.offer(child);
       }
     }
