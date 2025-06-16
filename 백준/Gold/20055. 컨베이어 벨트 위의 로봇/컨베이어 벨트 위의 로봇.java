@@ -1,94 +1,65 @@
-import java.util.*;
 import java.io.*;
+import java.util.*;
 
 public class Main {
-  static class Conveyor {
-    int hp;
-    boolean hasRobot;
-    public Conveyor(int hp) {
-      this.hp = hp;
+    static int N, K;
+    static int[] durability;
+    static boolean[] robots;
+    static int start = 0; // 벨트 시작 위치 인덱스 (0부터 2N-1)
+    
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        N = Integer.parseInt(st.nextToken());
+        K = Integer.parseInt(st.nextToken());
+
+        durability = new int[2 * N];
+        robots = new boolean[2 * N];
+
+        st = new StringTokenizer(br.readLine());
+        for (int i = 0; i < 2 * N; i++) {
+            durability[i] = Integer.parseInt(st.nextToken());
+        }
+
+        int step = 0;
+        int zeroCount = 0;
+
+        while (zeroCount < K) {
+            step++;
+
+            // 1. 벨트 회전 (start 위치 이동)
+            start = (start - 1 + 2 * N) % (2 * N);
+            // 내리는 위치에 로봇 있으면 내리기
+            int downPos = (start + N - 1) % (2 * N);
+            if (robots[downPos]) {
+                robots[downPos] = false;
+            }
+
+            // 2. 로봇 이동 (N-2부터 0까지)
+            for (int i = N - 2; i >= 0; i--) {
+                int cur = (start + i) % (2 * N);
+                int next = (start + i + 1) % (2 * N);
+                if (robots[cur] && !robots[next] && durability[next] > 0) {
+                    robots[cur] = false;
+                    robots[next] = true;
+                    durability[next]--;
+                    if (durability[next] == 0) zeroCount++;
+                }
+            }
+            // 내리는 위치에 로봇 있으면 내리기
+            if (robots[downPos]) {
+                robots[downPos] = false;
+            }
+
+            // 3. 로봇 올리기 (start 위치)
+            if (durability[start] > 0 && !robots[start]) {
+                robots[start] = true;
+                durability[start]--;
+                if (durability[start] == 0) zeroCount++;
+            }
+        }
+
+        System.out.println(step);
     }
-    @Override
-    public String toString() {
-      return "hp: "+hp+" | robot: "+(hasRobot?'o':'x');
-    }
-  }
-
-  static int N, K, in, out;
-  static List<Conveyor> belt = new ArrayList<>();
-  public static void main(String[] args) throws Exception {
-    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    StringTokenizer st = new StringTokenizer(br.readLine());
-
-    N = Integer.parseInt(st.nextToken());
-    K = Integer.parseInt(st.nextToken());
-    in = 0;
-    out = N-1;
-
-    st = new StringTokenizer(br.readLine());
-    for (int i=0; i<N*2; i++) {
-      int hp = Integer.parseInt(st.nextToken());
-      belt.add(new Conveyor(hp));
-    }
-
-    int count = 0;
-    while (K > 0) {
-      rotate();
-      takeRobot();
-
-      move();
-      // if (K <= 0) break; 와우.. count++은 해줘야 하니까..
-      takeRobot();
-
-      putRobot();
-      count++;
-    }
-
-    System.out.println(count);
-  }
-
-  static void rotate() {
-    // in, out 이동
-    in = ((in-1)+2*N)%(2*N);
-    out = ((out-1)+2*N)%(2*N);
-  }
-
-  static void move() {
-    if (in < out) {
-      int o = out-1;
-      while(o >= in && K > 0) { moveRobot(o--); }
-
-    } else {
-      int i = 2*N-1;
-      int o = out-1;
-      while (o >= 0 && K > 0) { moveRobot(o--); }
-      while ( i >= in && K > 0) { moveRobot(i--); }
-    }
-  }
-
-  static void moveRobot(int i) {
-    Conveyor cur = belt.get(i);
-    Conveyor next = belt.get((i+1)%(2*N));  
-
-    if (cur.hasRobot && !next.hasRobot && next.hp > 0) {
-      next.hasRobot = true;
-      if (--next.hp == 0) K--;
-      cur.hasRobot = false;
-    }
-  }
-
-  static void putRobot() {
-    Conveyor c = belt.get(in);
-    if(c.hp > 0) {
-      if (--c.hp == 0) K--;
-      c.hasRobot = true;
-    }
-  }
-
-  static void takeRobot() {
-    Conveyor c = belt.get(out);
-    if (c.hasRobot) {
-      c.hasRobot = false;
-    }
-  }
 }
