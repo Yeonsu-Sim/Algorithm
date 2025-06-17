@@ -2,92 +2,60 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-  static class Jam {
-    int weight, value;
-    Jam(int weight, int value) {
-      this.weight = weight;
-      this.value = value;
+    static class Jam implements Comparable<Jam> {
+        int weight, value;
+        Jam(int weight, int value) {
+            this.weight = weight;
+            this.value = value;
+        }
+
+        @Override
+        public int compareTo(Jam o) {
+            return this.weight - o.weight; // 무게 오름차순
+        }
     }
-    @Override
-    public String toString() {
-      return "["+weight+","+value+"]";
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        int N = Integer.parseInt(st.nextToken()); // 보석 수
+        int K = Integer.parseInt(st.nextToken()); // 가방 수
+
+        Jam[] jams = new Jam[N];
+        for (int i = 0; i < N; i++) {
+            st = new StringTokenizer(br.readLine());
+            int weight = Integer.parseInt(st.nextToken());
+            int value = Integer.parseInt(st.nextToken());
+            jams[i] = new Jam(weight, value);
+        }
+
+        int[] bags = new int[K];
+        for (int i = 0; i < K; i++) {
+            bags[i] = Integer.parseInt(br.readLine());
+        }
+
+        Arrays.sort(jams); // 보석 무게 기준 정렬
+        Arrays.sort(bags); // 가방 무게 기준 정렬
+
+        PriorityQueue<Jam> pq = new PriorityQueue<>((a, b) -> b.value - a.value); // 가치 높은 순
+        long totalValue = 0;
+        int jamIdx = 0;
+
+        for (int i = 0; i < K; i++) {
+            int capacity = bags[i];
+
+            // 현재 가방에 넣을 수 있는 보석들 PQ에 추가
+            while (jamIdx < N && jams[jamIdx].weight <= capacity) {
+                pq.offer(jams[jamIdx++]);
+            }
+
+            // 가장 가치 높은 보석을 가방에 담기
+            if (!pq.isEmpty()) {
+                totalValue += pq.poll().value;
+            }
+        }
+
+        System.out.println(totalValue);
     }
-  }
-
-  static int N,K;
-  static Jam[] jams;
-  static Jam[] bags;
-  public static void main(String[] args) throws Exception {
-    init();
-    solve();
-    System.out.println(maxSum());
-  }
-
-  static void init() throws Exception {
-    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    StringTokenizer st = new StringTokenizer(br.readLine());
-    N = Integer.parseInt(st.nextToken());
-    K = Integer.parseInt(st.nextToken());
-    jams = new Jam[N];
-    bags = new Jam[K];
-
-    for (int i=0; i<N; i++) {
-      st = new StringTokenizer(br.readLine());
-      int M = Integer.parseInt(st.nextToken());
-      int V = Integer.parseInt(st.nextToken());
-      jams[i] = new Jam(M,V);
-    }
-    
-    for (int i=0; i<K; i++) {
-      int M = Integer.parseInt(br.readLine());
-      bags[i] = new Jam(M, 0);
-    }
-  }
-
-  static void solve() {
-
-    // 보석 무게의 오름차순 정렬
-    Arrays.sort(jams, new Comparator<Jam>() {
-      @Override
-      public int compare(Jam o1, Jam o2) {
-        return Integer.compare(o1.weight, o2.weight);
-      }
-    });
-
-    // 가방 무게의 오름차순 정렬
-    Arrays.sort(bags, new Comparator<Jam>() {
-      @Override
-      public int compare(Jam o1, Jam o2) {
-        return Integer.compare(o1.weight, o2.weight);
-      }
-    });
-    
-    PriorityQueue<Jam> pq = new PriorityQueue<>(new Comparator<Jam>() {
-      @Override
-      public int compare(Jam o1, Jam o2) {
-        return Integer.compare(o2.value, o1.value);
-      }
-    });
-
-    // 가방에 들어갈 수 있는 가장 비싼 보석 고르기
-    int jamIdx = 0;
-    for (int i=0; i<K; i++) {
-      Jam bag = bags[i];
-      while (jamIdx < N && bag.weight >= jams[jamIdx].weight) {
-        pq.offer(jams[jamIdx++]);
-      }
-
-      if (!pq.isEmpty()) {
-        bag.value = pq.poll().value;
-      }
-    }
-  }
-
-  static long maxSum() {
-    long sum = 0;
-    for (int i=0; i<K; i++) {
-      sum += bags[i].value;
-    }
-    return sum;
-  }
 }
