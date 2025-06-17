@@ -1,61 +1,67 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
-    static class Jam implements Comparable<Jam> {
-        int weight, value;
-        Jam(int weight, int value) {
-            this.weight = weight;
-            this.value = value;
-        }
-
-        @Override
-        public int compareTo(Jam o) {
-            return this.weight - o.weight; // 무게 오름차순
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
+    static PriorityQueue<Gem> gems;
+    static TreeSet<Integer> bags;
+    static HashMap<Integer, Integer> counts;
+    static int N, K;
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
 
-        int N = Integer.parseInt(st.nextToken()); // 보석 수
-        int K = Integer.parseInt(st.nextToken()); // 가방 수
-
-        Jam[] jams = new Jam[N];
+        N = Integer.parseInt(st.nextToken());
+        K = Integer.parseInt(st.nextToken());
+        gems = new PriorityQueue<>();
         for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
-            int weight = Integer.parseInt(st.nextToken());
-            int value = Integer.parseInt(st.nextToken());
-            jams[i] = new Jam(weight, value);
+            int m = Integer.parseInt(st.nextToken());
+            int v = Integer.parseInt(st.nextToken());
+            gems.offer(new Gem(m, v));
         }
 
-        int[] bags = new int[K];
+        bags = new TreeSet<>();
+        counts = new HashMap<>();
         for (int i = 0; i < K; i++) {
-            bags[i] = Integer.parseInt(br.readLine());
+            int n = Integer.parseInt(br.readLine());
+            int count = counts.getOrDefault(n, 0);
+            if (count == 0) bags.add(n);
+            counts.put(n, count + 1);
         }
 
-        Arrays.sort(jams); // 보석 무게 기준 정렬
-        Arrays.sort(bags); // 가방 무게 기준 정렬
+        long result = 0;
 
-        PriorityQueue<Jam> pq = new PriorityQueue<>((a, b) -> b.value - a.value); // 가치 높은 순
-        long totalValue = 0;
-        int jamIdx = 0;
+        while (!gems.isEmpty()) {
+            Gem gem = gems.poll();
 
-        for (int i = 0; i < K; i++) {
-            int capacity = bags[i];
-
-            // 현재 가방에 넣을 수 있는 보석들 PQ에 추가
-            while (jamIdx < N && jams[jamIdx].weight <= capacity) {
-                pq.offer(jams[jamIdx++]);
+            if(bags.isEmpty()) break;
+            Integer bag = bags.ceiling(gem.m);
+            if(bag == null) continue;
+            result += gem.v;
+            int count = counts.get(bag) - 1;
+            if (count == 0) {
+                bags.remove(bag);
             }
-
-            // 가장 가치 높은 보석을 가방에 담기
-            if (!pq.isEmpty()) {
-                totalValue += pq.poll().value;
-            }
+            counts.put(bag, count);
         }
+        System.out.println(result);
+    }
 
-        System.out.println(totalValue);
+}
+
+class Gem implements Comparable<Gem> {
+    int m, v;
+
+    public Gem(int m, int v) {
+        this.m = m;
+        this.v = v;
+    }
+
+    @Override
+    public int compareTo(Gem o) {
+        if(this.v == o.v) return Integer.compare(this.m, o.m);
+        return Integer.compare(o.v, this.v);
     }
 }
