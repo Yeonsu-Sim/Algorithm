@@ -2,139 +2,65 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-  static class Pair implements Comparable<Pair>{
-    int n1,n2,sum;
-    Pair(int n1, int n2, int sum) {
-      this.n1 = n1;
-      this.n2 = n2;
-      this.sum = sum;
-    }
-    @Override
-    public int compareTo(Pair o) {
-      return Integer.compare(this.sum, o.sum);
-    }
-  }
-  public static void main(String[] args) throws Exception {
-    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    int N = Integer.parseInt(br.readLine());
 
-    TreeSet<Integer> negs = new TreeSet<>(Collections.reverseOrder());
-    TreeSet<Integer> poses = new TreeSet<>();
-    PriorityQueue<Pair> pairs = new PriorityQueue<>();
-
-    StringTokenizer st = new StringTokenizer(br.readLine());
-    for (int i=0; i<N; i++) {
-      int num = Integer.parseInt(st.nextToken());
-      if (num > 0) {
-        poses.add(num);
-      } else {
-        negs.add(num);
-      }
+    static class Pair implements Comparable<Pair> {
+        int n1, n2, sum;                       // 두 용액과 그 합의 |절댓값|
+        Pair(int n1, int n2, int sum) { this.n1 = n1; this.n2 = n2; this.sum = sum; }
+        @Override public int compareTo(Pair o) { return Integer.compare(this.sum, o.sum); }
     }
 
-    // 각 음수에 대해 최적의 짝궁찾기
-    for (int cur: negs) {
-      Integer neg = negs.first();
-      if (cur == neg) {
-        neg = negs.lower(cur);
-      }
-      int negSum = Integer.MAX_VALUE;
-      if (neg != null) {
-        negSum = Math.abs(cur + neg);
-      }
-      
-      int abs = cur*-1;
-      Integer ceil = poses.ceiling(abs);
-      Integer ceilSum = null;
-      if (ceil != null) {
-        ceilSum = Math.abs(cur + ceil);
-      }
-      Integer floor = poses.floor(abs);
-      Integer floorSum = null;
-      if (floor != null) {
-        floorSum = Math.abs(cur + floor);
-      }
-      
-      Integer pos = null;
-      Integer posSum = null;
-      if (ceil == null && floor == null) {
-        posSum = Integer.MAX_VALUE;
-      } else if (ceil == null) {
-        pos = floor;
-        posSum = floorSum;
-      } else if (floor == null) {
-        pos = ceil;
-        posSum = ceilSum;
-      } else {
-        if (ceilSum < floorSum) {
-          posSum = ceilSum;
-          pos = ceil;
-        } else {
-          posSum = floorSum;
-          pos = floor;
+    static void process(int cur,
+                        NavigableSet<Integer> same,
+                        NavigableSet<Integer> opp,
+                        PriorityQueue<Pair> pq) {
+
+        Integer sameMate = same.comparator() == null            // 오름차순(poses)
+                             ? same.higher(cur)                 // cur 보다 큰 쪽
+                             : same.lower(cur);                 // 내림차순(negs) → cur 보다 작은 쪽
+        int sameSum = sameMate == null ? Integer.MAX_VALUE : Math.abs(cur + sameMate);
+
+        int abs = Math.abs(cur);
+        Integer c1 = opp.floor(abs);
+        Integer c2 = opp.ceiling(abs);
+
+        Integer oppMate = null;
+        int oppSum = Integer.MAX_VALUE;
+        if (c1 != null) { oppMate = c1; oppSum = Math.abs(cur + c1); }
+        if (c2 != null && Math.abs(cur + c2) < oppSum) {
+            oppMate = c2;
+            oppSum = Math.abs(cur + c2);
         }
-      }
-      
-      if (neg != null && negSum < posSum) {
-          pairs.offer(new Pair(cur, neg, negSum));
-      } else if (pos != null) {
-          pairs.offer(new Pair(cur, pos, posSum));
-      }
-    }
-    
-    // 각 양수에 대해 최적의 짝궁찾기
-    for (int cur: poses) {
-      Integer pos = poses.first();
-      if (cur == pos) {
-        pos = poses.higher(cur);
-      }
-      int posSum = Integer.MAX_VALUE;
-      if (pos != null) {
-        posSum = Math.abs(cur + pos);
-      }
 
-      int abs = cur*-1;
-      Integer ceil = negs.ceiling(abs);
-      Integer ceilSum = null;
-      if (ceil != null) {
-        ceilSum = Math.abs(cur + ceil);
-      }
-      Integer floor = negs.floor(abs);
-      Integer floorSum = null;
-      if (floor != null) {
-        floorSum = Math.abs(cur + floor);
-      }
-      
-      Integer neg = null;
-      Integer negSum = null;
-      if (ceil == null && floor == null) {
-        negSum = Integer.MAX_VALUE;
-      } else if (ceil == null) {
-        neg = floor;
-        negSum = floorSum;
-      } else if (floor == null) {
-        neg = ceil;
-        negSum = ceilSum;
-      } else {
-        if (ceilSum < floorSum) {
-          negSum = ceilSum;
-          neg = ceil;
-        } else {
-          negSum = floorSum;
-          neg = floor;
+        if (sameSum < oppSum && sameMate != null) {
+            pq.offer(new Pair(cur, sameMate, sameSum));
+        } else if (oppMate != null) {
+            pq.offer(new Pair(cur, oppMate, oppSum));
         }
-      }
-
-      if (pos != null && posSum < negSum) {
-          pairs.offer(new Pair(cur, pos, posSum));
-      } else if (neg != null) {
-          pairs.offer(new Pair(cur, neg, negSum));
-      }
     }
 
+    public static void main(String[] args) throws Exception {
 
-    Pair answer = pairs.poll();
-    int n1 = answer.n1; int n2 = answer.n2;
-    System.out.print(Math.min(n1,n2)+" "+Math.max(n1,n2));
-  }
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int N = Integer.parseInt(br.readLine());
+
+        TreeSet<Integer> negs  = new TreeSet<>(Collections.reverseOrder()); // 음수: 내림차순
+        TreeSet<Integer> poses = new TreeSet<>();                           // 양수: 오름차순
+
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        for (int i = 0; i < N; i++) {
+            int v = Integer.parseInt(st.nextToken());
+            if (v > 0) poses.add(v); else negs.add(v);
+        }
+
+        PriorityQueue<Pair> pq = new PriorityQueue<>();
+
+        // 기존 로직 유지: 음수 집합 → 양수 집합 순으로 모두 탐색
+        for (int n : negs)  process(n, negs,  poses, pq);
+        for (int p : poses) process(p, poses, negs,  pq);
+
+        Pair ans = pq.poll();                    // 항상 최소 한 쌍 존재 (N ≥ 2 전제)
+        int a = Math.min(ans.n1, ans.n2);
+        int b = Math.max(ans.n1, ans.n2);
+        System.out.println(a + " " + b);
+    }
 }
