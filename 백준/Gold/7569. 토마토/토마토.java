@@ -17,6 +17,7 @@ public class Main {
 
     int[][][] box = new int[H][N][M];
     Queue<int[]> q = new ArrayDeque<>();
+    int left = 0;
 
     for (int h=0; h<H; h++) {
       for (int n=0; n<N; n++) {
@@ -24,6 +25,7 @@ public class Main {
         for (int m=0; m<M; m++) {
           int tomato = Integer.parseInt(st.nextToken());
           box[h][n][m] = tomato;
+          if (tomato == 0) left++;
           if (tomato == 1) {
             q.offer(new int[]{h,n,m});
           }
@@ -33,7 +35,7 @@ public class Main {
 
     int time = 0;
 
-    while (!isEnd(box)) {
+    while (left != 0) {
       if (q.isEmpty()) {
         System.out.println("-1");
         return;
@@ -54,6 +56,7 @@ public class Main {
           if (box[nh][ni][nj] == 0) {
             box[nh][ni][nj] = 1;
             q.offer(new int[]{nh,ni,nj});
+            left--;
           }
         }
       }
@@ -70,14 +73,4 @@ public class Main {
     return true;
   }
 
-  public static boolean isEnd(int[][][] arr) {
-    for (int h=0; h<H; h++) {
-      for (int n=0; n<N; n++) {
-        for (int m=0; m<M; m++) {
-          if (arr[h][n][m] == 0) return false;
-        }
-      }
-    }
-    return true;
-  }
 }
