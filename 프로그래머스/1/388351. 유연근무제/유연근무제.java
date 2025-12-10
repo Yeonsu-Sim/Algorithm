@@ -27,7 +27,6 @@ class Solution {
             min -= 60;
             hour++;
         }
-        if (hour >= 24) hour-=24;
         return hour*100 + min;
     }
 }
