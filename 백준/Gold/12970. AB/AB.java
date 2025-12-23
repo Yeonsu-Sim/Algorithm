@@ -20,12 +20,8 @@ public class Main {
 
     int sum = a*b;
     char[] answer = new char[N];
-    for (int i=0; i<a; i++) {
-      answer[i] = 'A';
-    }
-    for (int i=a; i<N; i++) {
-      answer[i] = 'B';
-    }
+    for (int i=0; i<a; i++) answer[i] = 'A';
+    for (int i=a; i<N; i++) answer[i] = 'B';
     
     int head = a-1;
     int tail = N-1;
@@ -41,17 +37,13 @@ public class Main {
         }
       }
 
-      if (answer[head+1] == 'A') {
-        tail = head;
-        continue;
-      }
-
       answer[head] = 'B';
       answer[head+1] = 'A';
-      head++;
       sum--;
+
+      head++;
     }
 
-    for (char c : answer) System.out.print(c);
+    System.out.println(answer);
   }
 }
