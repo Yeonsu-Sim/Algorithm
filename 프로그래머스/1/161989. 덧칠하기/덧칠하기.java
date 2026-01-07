@@ -1,12 +1,12 @@
 class Solution {
     public int solution(int n, int m, int[] section) {
         int answer = 0;
-        int cur = 0;
-        for (int i=0; i<section.length; i++) {
-            if (section[i] <= cur) {
+        int cur = section[0];
+        for (int num : section) {
+            if (num < cur) {
                 continue;
             }
-            cur = section[i]-1;
+            cur = num;
             cur += m;
             answer++;
         }
