@@ -31,14 +31,10 @@ public class Main {
 
                 if (a == 0 || b == 0 || c == 0 || d == 0) continue;
 
-                if (a == b && b == c) {
-                    arr[i][j] = a + 1;
-                } else {
-                    int min = Math.min(a,b);
-                    min = Math.min(min, c);
+                int min = Math.min(a,b);
+                min = Math.min(min, c);
 
-                    arr[i][j] = min+1;
-                }
+                arr[i][j] = min+1;
             }
         }
 
@@ -48,8 +44,6 @@ public class Main {
                 max = Math.max(max, arr[i][j]);
             }
         }
-
-        // for (int[] a: arr) System.out.println(Arrays.toString(a));
 
         System.out.println(max*max);
     }
