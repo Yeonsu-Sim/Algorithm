@@ -30,14 +30,15 @@ public class Main {
         arr[i] = target;
         arr[i-1] = tmp;
         
+        StringBuilder sb = new StringBuilder();
         for (int j=0; j<i; j++) {
-          System.out.print(arr[j]+" ");
+          sb.append(arr[j]+" ");
         }
 
         for (int j=i; j<N; j++) pq.offer(arr[j]);
 
-        while (!pq.isEmpty()) System.out.print(pq.poll()+" ");
-
+        while (!pq.isEmpty()) sb.append(pq.poll()+" ");
+        System.out.print(sb);
         return;
       }
     }
