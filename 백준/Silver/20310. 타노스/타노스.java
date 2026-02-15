@@ -1,3 +1,4 @@
+import java.util.*;
 import java.io.*;
 
 public class Main {
@@ -9,18 +10,43 @@ public class Main {
         int zero = 0;
         int one = 0;
 
+        char[] answer = new char[line.length()];
+
         for (int i=0; i<line.length(); i++) {
             char c = line.charAt(i);
+            answer[i] = c;
             if (c == '0') zero++;
             else one++;
         }
 
-        StringBuilder sb = new StringBuilder();
         zero /= 2;
         one /= 2;
-        while (zero-- > 0) sb.append('0');
-        while (one-- > 0) sb.append('1');
 
+        int idx = line.length()-1;
+        while (zero > 0) {
+            if (answer[idx] == '0') {
+                answer[idx] = ' ';
+                zero--;
+            }
+            idx--;
+        }
+
+        idx = 0;
+        while (one > 0) {
+            if (answer[idx] == '1') {
+                answer[idx] = ' ';
+                one--;
+            }
+            idx++;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        idx = 0;
+        while (idx < line.length()) {
+            if (answer[idx] != ' ') sb.append(answer[idx]);
+            idx++;
+        }
+        
         System.out.println(sb);
     }
 }
