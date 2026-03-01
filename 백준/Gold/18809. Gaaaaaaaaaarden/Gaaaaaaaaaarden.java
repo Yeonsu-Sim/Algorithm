@@ -1,120 +1,111 @@
-import java.util.*;
 import java.io.*;
+import java.util.*;
 
 public class Main {
-
-    static int N, M, G, R, answer;
-    static int[][] map;
-    static List<Pos> base = new LinkedList<>();
-
-    static class Pos {
-        int i, j;
-        Pos(int i, int j) { this.i = i; this.j = j; }
-    }
-
-    public static void main(String[] args) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
-        G = Integer.parseInt(st.nextToken());
-        R = Integer.parseInt(st.nextToken());
-
-        map = new int[N][M];
-        for (int i=0; i<N; i++) {
-            st = new StringTokenizer(br.readLine());
-            for (int j=0; j<M; j++) {
-                int n = Integer.parseInt(st.nextToken());
-                map[i][j] = n;
-
-                if (n == 2) {
-                    base.add(new Pos(i,j));
-                }
+    
+    private static int n, m, g, r, pCnt, max;
+    private static int[] plantableLand, comb;
+    private static int[][] times, colors, dirs = {{0,1},{0,-1},{1,0},{-1,0}};
+    private static boolean[][] isLake;
+    private static Queue<Integer> queue;
+    
+    public static void main(String... args) throws IOException {
+        n = readInt();
+        m = readInt();
+        g = readInt();
+        r = readInt();
+        
+        isLake = new boolean[n][m];
+        plantableLand = new int[n*m];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                int v = readInt();
+                if (v == 0) isLake[i][j] = true;
+                else if (v == 2) plantableLand[pCnt++] = i*m+j;
             }
         }
+        
+        comb = new int[pCnt];
+        times = new int[n][m];
+        colors = new int[n][m];
+        queue = new ArrayDeque<>();
+        dfs(0, 0, 0);
 
-        comb(0, new int[base.size()], 0, 0);
-        System.out.println(answer);
+        System.out.print(max);
     }
-
-    public static void comb(int depth, int[] out, int gCnt, int rCnt) {
-        if (depth == base.size()) {
-            if (gCnt == G && rCnt == R) {
-                simulate(out);
-            }
+    
+    private static void dfs(int depth, int gUsed, int rUsed) {
+        if (gUsed > g || rUsed > r) return;
+        if (depth == pCnt) {
+            if (gUsed == g && rUsed == r) max = Math.max(max, simulate());
             return;
         }
-
-        if (base.size() - depth < R - rCnt + G - gCnt) return;
-
-        out[depth] = 0;
-        comb(depth+1, out, gCnt, rCnt);
-        if (gCnt < G) {
-            out[depth] = 1;
-            comb(depth+1, out, gCnt+1, rCnt);
+        
+        comb[depth] = 0;
+        dfs(depth+1, gUsed, rUsed);
+        
+        comb[depth] = 1;
+        dfs(depth+1, gUsed+1, rUsed);
+        
+        comb[depth] = 2;
+        dfs(depth+1, gUsed, rUsed+1);        
+    }
+    
+    private static int simulate() {        
+        for (int i = 0; i < n; i++) {
+            Arrays.fill(times[i], -1);
+            Arrays.fill(colors[i], 0); 
         }
-        if (rCnt < R ) {
-            out[depth] = 2;
-            comb(depth+1, out, gCnt, rCnt+1);
+        
+        queue.clear();
+        for (int i = 0; i < pCnt; i++) {
+            if (comb[i] == 0) continue;
+            
+            int r = plantableLand[i]/m, c = plantableLand[i]%m;
+            times[r][c] = 0;
+            colors[r][c] = comb[i];
+            queue.offer(plantableLand[i]);
         }
+        
+        int fCnt = 0;        
+        while (!queue.isEmpty()) {
+            int cur = queue.poll();
+            int r = cur/m, c = cur%m, color = colors[r][c];
+            if (color == 3) continue;
+            // 칸이 꽃피울수 있는 칸
+            // 서로 다른색이 같은턴에 퍼짐
+            for (int[] d : dirs) {
+                int nr = r+d[0], nc = c+d[1];
+                if (nr < 0 || nr >= n || nc < 0 || nc >= m || isLake[nr][nc] || colors[nr][nc] == 3) continue;
+                if (times[nr][nc] == -1) {
+                    times[nr][nc] = times[r][c]+1;
+                    colors[nr][nc] = color;
+                    queue.offer(nr*m+nc);    
+                } else if (times[nr][nc] == times[r][c]+1 && colors[nr][nc] != color && colors[nr][nc] != 3) {
+                    colors[nr][nc] = 3;
+                    fCnt++;
+                }                
+            }
+        }
+        
+        return fCnt;
     }
 
-    static int[] dy = new int[]{0, 0, -1, 1};
-    static int[] dx = new int[]{-1, 1, 0, 0};
-    // out: 0(없음) | 1(G) | 2(R)
-    // map: 0(호수) | 1(땅) | 2(베이스) | 3(G) | 4(R) | 5(꽃)
-    public static void simulate(int[] out) {
-        int fCnt = 0;
+    public static int readInt() throws IOException {
+        int r = 0, c = System.in.read();
+        boolean negative = false;       
 
-        int[][] tmp = new int[N][];
-        for (int t=0; t<N; t++) tmp[t] = Arrays.copyOf(map[t], M);
-
-        Queue<Pos> q = new ArrayDeque<>();
-        for (int o=0; o<out.length; o++) {
-            if (out[o] == 0) continue;
-            Pos pos = base.get(o);
-            tmp[pos.i][pos.j] = 2 + out[o];
-            q.offer(pos);
+        while (c <= ' ') c = System.in.read();
+        if (c == '-') {
+            negative = true;
+            c = System.in.read();
+        }
+        while (c >= '0' && c <= '9') {
+            r *= 10;
+            r += c - '0';
+            c = System.in.read();
         }
 
-        while (!q.isEmpty()) {
-            // spread: 3(G) | 4(R) | 5(꽃)
-            HashMap<String, Integer> spread = new HashMap<>();
-            
-            int size = q.size();
-            while (size-- > 0) {
-                Pos cur = q.poll();
-                int value = tmp[cur.i][cur.j];
-                
-                for (int d=0; d<4; d++) {
-                    int ni = cur.i + dy[d];
-                    int nj = cur.j + dx[d];
-    
-                    if (ni < 0 || ni >= N || nj < 0 || nj >= M) continue;
-                    if (tmp[ni][nj] < 1 || tmp[ni][nj] > 2) continue; // 땅이 아닐 때
-                    
-                    String key = ni+","+nj;
-                    Integer s = spread.get(key);
-
-                    if (s == null) spread.put(key, value);
-                    else if (s != value && s != 5) spread.put(key, 5);
-                }
-            }
-
-            for (String key : spread.keySet()) {
-                int s = spread.get(key);
-
-                String[] pos = key.split(",");
-                int i = Integer.parseInt(pos[0]);
-                int j = Integer.parseInt(pos[1]);
-                tmp[i][j] = s;
-
-                if (s < 5) q.offer(new Pos(i,j));
-                else fCnt++;  // 꽃 폈을 때
-            }
-        }
-
-        answer = Math.max(answer, fCnt);
+        return negative ? -r : r;
     }
 }
