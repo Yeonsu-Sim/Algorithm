@@ -21,7 +21,7 @@ public class Main {
                 double t = Double.parseDouble(st.nextToken());
 
                 double start = 1;
-                double end = 1000000000;
+                double end = 1000;
                 double answer = 0;
 
                 int range=400;
