@@ -24,7 +24,7 @@ public class Main {
                 double end = 1000;
                 double answer = 0;
 
-                int range=400;
+                int range=100;
                 while (range-->0) {
                     double mid = (start + end) / 2;
 
