@@ -1,6 +1,5 @@
 import java.util.*;
 import java.io.*;
-import java.lang.*;
 
 public class Main {
     public static double fuel(double a, double b, double c, double d, double m, double v) {
@@ -9,7 +8,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        StringBuilder sb = new StringBuilder();
 
         while (true) {
             try {
@@ -37,11 +36,11 @@ public class Main {
                     }
                 }
 
-                bw.write(String.format("%.2f", (int) (answer * 100) / 100f) + "\n");
-                bw.flush();
-            } catch (Exception ignored) {
+                sb.append(String.format("%.2f\n",(double)(int)(answer*100)/100));
+            } catch (Exception e) {
                 break;
             }
         }
+        System.out.println(sb);
     }
 }
