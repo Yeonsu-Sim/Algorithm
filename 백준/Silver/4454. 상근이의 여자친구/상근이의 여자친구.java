@@ -2,14 +2,10 @@ import java.util.*;
 import java.io.*;
 
 public class Main {
-    public static double fuel(double a, double b, double c, double d, double m, double v) {
-        return m*(a * Math.pow(v, 3) + b * Math.pow(v, 2) + c * Math.pow(v, 1) + d);
-    }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringBuilder sb = new StringBuilder();
-
         while (true) {
             try {
                 StringTokenizer st = new StringTokenizer(br.readLine());
@@ -19,24 +15,14 @@ public class Main {
                 double d = Double.parseDouble(st.nextToken());
                 double m = Double.parseDouble(st.nextToken());
                 double t = Double.parseDouble(st.nextToken());
-
-                double start = 1;
-                double end = 1000;
-                double answer = 0;
-
-                int range=100;
-                while (range-->0) {
-                    double mid = (start + end) / 2;
-
-                    if (t < fuel(a, b, c, d, m, mid))
-                        end = mid;
-                    else {
-                        answer = mid;
-                        start = mid;
-                    }
+        
+                double maxV = 0;
+                for (double j=0; j<=100000; j++) {
+                    double v = j/100;
+                    if (t/m >= a*v*v*v + b*v*v + c*v + d) maxV = v;
+                    else break;
                 }
-
-                sb.append(String.format("%.2f\n",(double)(int)(answer*100)/100));
+                sb.append(String.format("%.2f\n", maxV));
             } catch (Exception e) {
                 break;
             }
