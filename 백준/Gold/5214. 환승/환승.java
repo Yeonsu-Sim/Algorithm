@@ -32,12 +32,16 @@ public class Main {
         q.offer(1);
         visited[1] = 1;
 
+        boolean[] tubeVisited = new boolean[M];
+
         while (!q.isEmpty()) {
             int cur = q.poll();
             if (cur == N) break;
             int cnt = visited[cur];
 
             for (int tube : stations.get(cur)) {
+                if (tubeVisited[tube]) continue;
+                tubeVisited[tube] = true;
                 for (int next : tubes[tube]) {
                     if (visited[next]>=0) continue;
                     visited[next] = cnt+1;
