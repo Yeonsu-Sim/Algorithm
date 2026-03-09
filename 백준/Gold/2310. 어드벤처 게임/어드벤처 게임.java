@@ -50,16 +50,16 @@ public class Main {
     }
 
     static boolean dfs(int roomNo, int coin) {
-        if (dp[roomNo] >= coin) return false;
-        dp[roomNo] = coin;
-
         int nextCoin = passing(roomNo, coin);
         if (nextCoin < 0) return false;
+
+        if (dp[roomNo] >= nextCoin) return false;
+        dp[roomNo] = nextCoin;
 
         if (roomNo == N) return true;
 
         for (int next : edges.get(roomNo)) {
-            if(dfs(next, nextCoin)) return true;
+            if (dfs(next, nextCoin)) return true;
         }
         return false;
     }
