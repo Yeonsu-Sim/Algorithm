@@ -1,11 +1,49 @@
-import java.util.*;
 import java.io.*;
+import java.util.*;
 
 public class Main {
     static int N;
-    static Room[] rooms;
-    static int[] dp;  // 방을 지날 때 소지할 수 있는 coin의 최선
-    static List<List<Integer>> edges;
+    static char[] type;
+    static int[] value;
+    static ArrayList<Integer>[] graph;
+
+    static int enter(int room, int money) {
+        if (type[room] == 'E') return money;
+        if (type[room] == 'L') return Math.max(money, value[room]);
+        return money - value[room]; // T
+    }
+
+    static boolean canReach() {
+        int[] best = new int[N + 1];
+        Arrays.fill(best, -1);
+
+        Queue<Integer> q = new ArrayDeque<>();
+
+        int startMoney = enter(1, 0);
+        if (startMoney < 0) return false;
+
+        best[1] = startMoney;
+        q.offer(1);
+
+        while (!q.isEmpty()) {
+            int cur = q.poll();
+            int curMoney = best[cur];
+
+            if (cur == N) return true;
+
+            for (int next : graph[cur]) {
+                int nextMoney = enter(next, curMoney);
+                if (nextMoney < 0) continue;
+
+                if (best[next] < nextMoney) {
+                    best[next] = nextMoney;
+                    q.offer(next);
+                }
+            }
+        }
+
+        return false;
+    }
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -15,61 +53,27 @@ public class Main {
             N = Integer.parseInt(br.readLine());
             if (N == 0) break;
 
-            rooms = new Room[N+1];
-            dp = new int[N+1];
-            Arrays.fill(dp, -1);
-            edges = new ArrayList<>();
-            for (int i=0; i<=N; i++) edges.add(new ArrayList<>());
+            type = new char[N + 1];
+            value = new int[N + 1];
+            graph = new ArrayList[N + 1];
 
-            StringTokenizer st;
-            for (int i=1; i<=N; i++) {
-                st = new StringTokenizer(br.readLine());
+            for (int i = 1; i <= N; i++) graph[i] = new ArrayList<>();
 
-                char c = st.nextToken().charAt(0);
-                int coin = Integer.parseInt(st.nextToken());
-                rooms[i] = new Room(c, coin);
+            for (int i = 1; i <= N; i++) {
+                StringTokenizer st = new StringTokenizer(br.readLine());
+                type[i] = st.nextToken().charAt(0);
+                value[i] = Integer.parseInt(st.nextToken());
 
-                int door = Integer.parseInt(st.nextToken());
-                while (door != 0) {
-                    edges.get(i).add(door);
-                    door = Integer.parseInt(st.nextToken());
+                while (true) {
+                    int next = Integer.parseInt(st.nextToken());
+                    if (next == 0) break;
+                    graph[i].add(next);
                 }
             }
 
-            sb.append(dfs(1, 0) ? "Yes": "No").append('\n');
+            sb.append(canReach() ? "Yes" : "No").append('\n');
         }
 
         System.out.print(sb);
-    }
-
-    static int passing(int roomNo, int coin) {
-        Room r = rooms[roomNo];
-        if (r.c == 'E') return coin;
-        else if (r.c == 'L') return coin < r.coin ? r.coin : coin;
-        else return coin - r.coin;
-    }
-
-    static boolean dfs(int roomNo, int coin) {
-        int nextCoin = passing(roomNo, coin);
-        if (nextCoin < 0) return false;
-
-        if (dp[roomNo] >= nextCoin) return false;
-        dp[roomNo] = nextCoin;
-
-        if (roomNo == N) return true;
-
-        for (int next : edges.get(roomNo)) {
-            if (dfs(next, nextCoin)) return true;
-        }
-        return false;
-    }
-
-    static class Room {
-        char c;
-        int coin;
-        Room(char c, int coin) {
-            this.c = c;
-            this.coin = coin;
-        }
     }
 }
