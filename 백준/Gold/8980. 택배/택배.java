@@ -12,7 +12,7 @@ public class Main {
         int M = Integer.parseInt(br.readLine());
 
         PriorityQueue<Box> pq = new PriorityQueue<>(
-            (Box a, Box b) -> a.length - b.length
+            (a, b) -> (a.to == b.to) ? a.from - b.from : a.to - b.to
         );
         
         while (M-- > 0) {
