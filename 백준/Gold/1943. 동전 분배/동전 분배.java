@@ -29,25 +29,26 @@ public class Main {
                 sb.append("0\n");
                 continue;
             }
-            
+
             int half = sum/2;
-            boolean[] dp = new boolean[half+1];
-            dp[0] = true;
+            int[] dp = new int[half+1];
+            dp[0] = 1;
 
-            for (int i = 0; i < N; i++) {
-                int coin = arr[i][0];
-                int cnt = arr[i][1];
-                int[] used = new int[half + 1]; // 이 동전을 몇 개 써서 j에 도달했는지
+            for (int i=0; i<N; i++) {
+                int[] tmp = new int[half+1];
+                for (int j=0; j<half+1; j++) {
+                    if (dp[j] == 0) continue;
+                    
+                    int next = j+arr[i][0];
+                    if (next > half) break;
+                    if (dp[next] == 1) continue;
 
-                for (int j = coin; j <= half; j++) {
-                    // 아직 도달 못했고, coin만큼 빼면 도달 가능하며, 개수 제한 안 넘으면
-                    if (!dp[j] && dp[j - coin] && used[j - coin] < cnt) {
-                        dp[j] = true;
-                        used[j] = used[j - coin] + 1;
-                    }
+                    if (tmp[j] == arr[i][1]) continue;
+                    tmp[next] = tmp[j]+1;
+                    dp[next] = 1;
                 }
             }
-            sb.append((dp[half] ? '1' : '0') +"\n");
+            sb.append(dp[half]+"\n");
         }
 
         System.out.print(sb);
