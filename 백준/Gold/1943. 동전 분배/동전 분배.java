@@ -29,13 +29,13 @@ public class Main {
                 sb.append("0\n");
                 continue;
             }
-
+            
             int half = sum/2;
             int[] dp = new int[half+1];
             dp[0] = 1;
 
             for (int i=0; i<N; i++) {
-                int[] tmp = new int[half+1];
+                int[] tmp = new int[half+1];  // 동전 쓴 개수 저장
                 for (int j=0; j<half+1; j++) {
                     if (dp[j] == 0) continue;
                     
